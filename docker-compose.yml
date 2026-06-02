@@ -1,0 +1,23 @@
+services:
+  rag-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      # 必填：DashScope Key（运行时注入）
+      DASHSCOPE_API_KEY: ${DASHSCOPE_API_KEY}
+      # 可选：开启 API 鉴权（不填则放行，适合本地 demo）
+      API_KEY: ${API_KEY-}
+      # 上传限制
+      MAX_UPLOAD_FILES: ${MAX_UPLOAD_FILES-10}
+      MAX_UPLOAD_MB: ${MAX_UPLOAD_MB-20}
+    volumes:
+      # 持久化向量库与去重/历史文件
+      - ./1/chroma_db:/app/1/chroma_db
+      - ./1/md5.text:/app/1/md5.text
+      - ./1/chat_history.json:/app/1/chat_history.json
+      # session 级历史文件会生成 chat_history_<session>.json，挂载整个目录以保留
+      - ./1:/app/1
+
